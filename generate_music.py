@@ -32,7 +32,6 @@ def create_midi(prediction_output, filename):
             new_note.offset = offset
             new_note.storedInstrument = instr
             output_notes.append(new_note)
-
         # increase offset each iteration so that notes do not stack
         offset += 0.5
 
