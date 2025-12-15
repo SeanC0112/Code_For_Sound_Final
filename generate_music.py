@@ -47,6 +47,8 @@ def generate_music(generator_model, latent_dim, n_vocab, length=500):
     
     # Scale back the predictions to the original range
     pred_notes = [x * (n_vocab / 2) + (n_vocab / 2) for x in predictions[0]]
+    # pred_notes = [x * (n_vocab-1) for x in predictions[0]]
+
     
     # Map generated integer indices to note names
     pitchnames = sorted(set(item for item in notes))

@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 SEQUENCE_LENGTH = 100
 LATENT_DIMENSION = 1000
-BATCH_SIZE = 16
-EPOCHS = 100
+BATCH_SIZE = 37
+EPOCHS = 200
 SAMPLE_INTERVAL = 1
 
 def get_notes():
@@ -163,6 +163,9 @@ class GAN():
         model.add(LeakyReLU(alpha=0.2))
         model.add(BatchNormalization(momentum=0.8))
         model.add(Dense(1024))
+        model.add(LeakyReLU(alpha=0.2))
+        model.add(BatchNormalization(momentum=0.8))
+        model.add(Dense(2048))
         model.add(LeakyReLU(alpha=0.2))
         model.add(BatchNormalization(momentum=0.8))
         model.add(Dense(np.prod(self.seq_shape), activation='tanh'))
