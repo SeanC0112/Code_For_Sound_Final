@@ -46,14 +46,19 @@ def generate_music(generator_model, latent_dim, n_vocab, length=500):
     predictions = generator_model.predict(noise)
     
     # Scale back the predictions to the original range
-    pred_notes = [x * (n_vocab / 2) + (n_vocab / 2) for x in predictions[0]]
+    # pred_notes = [x * (n_vocab / 2) + (n_vocab / 2) for x in predictions[0]]
     # pred_notes = [x * (n_vocab-1) for x in predictions[0]]
 
     
     # Map generated integer indices to note names
     pitchnames = sorted(set(item for item in notes))
     int_to_note = dict((number, note) for number, note in enumerate(pitchnames))
-    pred_notes_mapped = [int_to_note[int(x)] for x in pred_notes]
+    pred_notes = [np.clip(x * (len(int_to_note) / 2) + (len(int_to_note) / 2), 0, len(int_to_note)-1) for x in predictions[0]]
+    try:
+        pred_notes_mapped = [int_to_note[int(x)] for x in pred_notes]
+    except:
+        print(pred_notes)
+        print(int_to_note)
     
     return pred_notes_mapped[:length]
 
@@ -65,8 +70,9 @@ if __name__ == '__main__':
     notes = get_notes()
     n_vocab = len(set(notes))
     
+    for i in range(50):
     # Generate new music sequence
-    generated_music = generate_music(generator_model, LATENT_DIMENSION, n_vocab)
-    
-    # Create a MIDI file from the generated music
-    create_midi(generated_music, 'generated_music')
+        generated_music = generate_music(generator_model, LATENT_DIMENSION, n_vocab)
+        
+        # Create a MIDI file from the generated music
+        create_midi(generated_music, f'generated_music_{i}')

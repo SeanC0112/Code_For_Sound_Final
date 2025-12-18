@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 SEQUENCE_LENGTH = 100
 LATENT_DIMENSION = 1000
-BATCH_SIZE = 37
-EPOCHS = 200
+BATCH_SIZE = 38
+EPOCHS = 300
 SAMPLE_INTERVAL = 1
 
 def get_notes():
@@ -26,12 +26,13 @@ def get_notes():
         print("Parsing %s" % file)
 
         notes_to_parse = midi.flat.notes
+        print("notes_to_parse:",list(notes_to_parse))
 
         for element in notes_to_parse:
             if isinstance(element, note.Note):
-                notes.append(str(element.pitch))
+                notes.append(str(element.pitch.midi))
             elif isinstance(element, chord.Chord):
-                notes.append('.'.join(str(n) for n in element.normalOrder))
+                notes.append('.'.join(str(n.midi) for n in element.pitches))
 
     return notes
 
@@ -227,14 +228,16 @@ class GAN():
     def generate(self, input_notes):
         # Get pitch names and store in a dictionary
         notes = input_notes
+        print("notes:",notes)
         pitchnames = sorted(set(item for item in notes))
+        print("pitchnames:",pitchnames)
         int_to_note = dict((number, note) for number, note in enumerate(pitchnames))
         
         # Use random noise to generate sequences
         noise = np.random.normal(0, 1, (1, self.latent_dim))
         predictions = self.generator.predict(noise)
         
-        pred_notes = [x*242+242 for x in predictions[0]]
+        pred_notes = [(x*len(int_to_note)/2)+(len(int_to_note)/2) for x in predictions[0]]
         
         # Map generated integer indices to note names, with error handling
         pred_notes_mapped = []
@@ -247,6 +250,7 @@ class GAN():
                 pred_notes_mapped.append('C5')  # You can choose any default note here
         
         create_midi(pred_notes_mapped, 'gan_final')
+        print(int_to_note, predictions, pred_notes, pred_notes_mapped)
 
         
     def plot_loss(self):
